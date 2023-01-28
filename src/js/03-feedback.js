@@ -9,16 +9,17 @@ const refs = {
 
 const LOCALSTORAGE_KEY = 'feedback-form-state';
 
+populateInputs();
+
+refs.form.addEventListener('submit', onSubmit);
+refs.form.addEventListener('input', throttle(onTextInput, 500));
+
 let formData = {};
 
-refs.form.addEventListener('input', throttle(saveData, 500));
-
-function saveData(e) {
+function onTextInput(e) {
   formData[e.target.name] = e.target.value;
   localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(formData));
 }
-
-refs.form.addEventListener('submit', onSubmit);
 
 function onSubmit(e) {
   e.preventDefault();
@@ -26,4 +27,14 @@ function onSubmit(e) {
   formData = {};
   localStorage.removeItem(LOCALSTORAGE_KEY);
   e.target.reset();
+}
+
+function populateInputs() {
+  const savedMessage = localStorage.getItem(LOCALSTORAGE_KEY);
+  const savedMessageJSON = JSON.parse(savedMessage);
+
+  if (savedMessage) {
+    refs.email.value = savedMessageJSON.email || '';
+    refs.message.value = savedMessageJSON.message || '';
+  }
 }
